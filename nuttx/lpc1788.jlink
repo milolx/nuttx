@@ -1,0 +1,6 @@
+exec device=lpc1788
+speed auto
+r
+h
+loadbin nuttx.bin,0
+q
