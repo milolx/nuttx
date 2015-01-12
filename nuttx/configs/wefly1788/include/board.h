@@ -84,6 +84,24 @@
   (((BOARD_PLL1CFG_MSEL-1) << SYSCON_PLLCFG_MSEL_SHIFT) | \
    ((BOARD_PLL1CFG_PSEL-1) << SYSCON_PLLCFG_PSEL_SHIFT))
 
+/* Ethernet GPIO                    PIN  SIGNAL NAME
+ * -------------------------------- ---- --------------
+ * P1[0]/ENET_TXD0                   95  E_TXD0
+ * P1[1]/ENET_TXD1                   94  E_TXD1
+ * P1[4]/ENET_TX_EN                  93  E_TX_EN
+ * P1[8]/ENET_CRS                    92  E_CRS
+ * P1[9]/ENET_RXD0                   91  E_RXD0
+ * P1[10]/ENET_RXD1                  90  E_RXD1
+ * P1[14]/ENET_RX_ER                 89  E_RX_ER
+ * P1[15]/ENET_REF_CLK               88  E_REF_CLK
+ * P1[16]/ENET_MDC                   87  E_MDC
+ * P1[17]/ENET_MDIO                  86  E_MDIO
+ */
+#define GPIO_ENET_CRS              GPIO_ENET_CRSDV
+#define GPIO_ENET_MDC              GPIO_ENET_MDC_2
+#define GPIO_ENET_MDIO             GPIO_ENET_MDIO_1
+
+
 #ifdef CONFIG_LPC17_EMC
 /* EMC clock selection.
  *
