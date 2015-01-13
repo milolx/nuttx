@@ -2011,7 +2011,7 @@ static inline int lpc17_phyinit(struct lpc17_driver_s *priv)
    * latches different at different addresses.
    */
 
-  for (phyaddr = 1; phyaddr < 32; phyaddr++)
+  for (phyaddr = 0; phyaddr < 32; phyaddr++)
     {
        /* Check if we can see the selected device ID at this
         * PHY address.
