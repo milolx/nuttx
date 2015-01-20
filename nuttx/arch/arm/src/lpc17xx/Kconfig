@@ -413,11 +413,17 @@ config LPC17_EXTDRAM
 
 if LPC17_EXTDRAM
 
+config LPC17_EXTDRAMBASE
+	int "External SDRAM base addr"
+	default 0xa0000000
+	---help---
+		Base addr of the external SDRAM in bytes.
+
 config LPC17_EXTDRAMSIZE
-	int "External SDRAM size"
+	int "External SDRAM size (MB)"
 	default 0
 	---help---
-		Size of the external SDRAM in bytes.
+		Size of the external SDRAM in Mbytes.
 
 choice
 	prompt "SDRAM Width Selection"
