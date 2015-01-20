@@ -1,43 +1,3 @@
-/************************************************************************************
- * configs/open1788/src/lpc17_sdraminitialize.c
- * arch/arm/src/board/lpc17_sdraminitialize.c
- *
- *   Copyright (C) 2013 Gregory Nutt. All rights reserved.
- *   Author: Gregory Nutt <gnutt@nuttx.org>
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- * 3. Neither the name NuttX nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- ************************************************************************************/
-
-/************************************************************************************
- * Included Files
- ************************************************************************************/
-
 #include <nuttx/config.h>
 
 #include <debug.h>
@@ -50,7 +10,7 @@
 #include "chip/lpc17_syscon.h"
 #include "lpc17_emc.h"
 
-#include "open1788.h"
+#include "wefly1788.h"
 
 #if defined(CONFIG_LPC17_EMC) && defined(CONFIG_LPC17_EXTDRAM)
 
@@ -78,8 +38,6 @@
 
 /* Set up for 32-bit SDRAM at CS0 */
 
-#define CONFIG_LPC17_SDRAM_32BIT
-
 #ifdef CONFIG_LPC17_SDRAM_16BIT
 #  define SDRAM_SIZE        0x02000000 /* 256Mbit */
 #else /* if defined(CONFIG_LPC17_SDRAM_32BIT) */
@@ -99,14 +57,14 @@
  ************************************************************************************/
 
 /************************************************************************************
- * Name: open1788_sdram_initialize
+ * Name: wefly1788_sdram_initialize
  *
  * Description:
  *   Initialize SDRAM
  *
  ************************************************************************************/
 
-void open1788_sdram_initialize(void)
+void wefly1788_sdram_initialize(void)
 {
   uint32_t regval;
   int i;
@@ -154,7 +112,7 @@ void open1788_sdram_initialize(void)
 
   putreg32(MDKCFG_RASCAS0VAL, LPC17_EMC_DYNAMICRASCAS0);
 
-  #ifdef CONFIG_LPC17_SDRAM_16BIT
+#ifdef CONFIG_LPC17_SDRAM_16BIT
     /* For Manley lpc1778 SDRAM: H57V2562GTR-75C, 256Mb, 16Mx16, 4 banks, row=13, column=9:
      *
      * 256Mb, 16Mx16, 4 banks, row=13, column=9, RBC
