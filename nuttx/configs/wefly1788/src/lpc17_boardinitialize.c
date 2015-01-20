@@ -14,6 +14,7 @@
 #include "lpc17_emc.h"
 
 #include "../include/board.h"
+#include "wefly1788.h"
 
 /************************************************************************************
  * Definitions
@@ -44,17 +45,17 @@ void lpc17_boardinitialize(void)
 #ifdef CONFIG_LPC17_EMC
   lpc17_emcinitialize();
 #ifdef CONFIG_LPC17_EXTDRAM
-  open1788_sdram_initialize();
+  wefly1788_sdram_initialize();
 #endif
 #ifdef CONFIG_LPC17_EXTNAND
-  open1788_nand_initialize();
+  wefly1788_nand_initialize();
 #endif
 #endif
 
   /* Configure the LCD GPIOs if LCD support has been selected. */
 
 #ifdef CONFIG_LPC17_LCD
-  open1788_lcd_initialize();
+  wefly1788_lcd_initialize();
 #endif
 }
 
