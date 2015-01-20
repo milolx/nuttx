@@ -152,13 +152,17 @@
 #  endif /* LPC17_BANK0_HEAPSIZE */
 #endif /* LPC17_HAVE_BANK0 */
 
+#if defined(CONFIG_LPC17_EXTDRAM) && defined(CONFIG_LPC17_EXTDRAMHEAP)
+#  define LPC17_EXTSDRAM_HEAPBASE CONFIG_LPC17_EXTDRAMBASE
+#endif
+
 /* Sanity checking */
 
 #ifdef LPC17_AHB_HEAPBASE
 #  if CONFIG_MM_REGIONS < 2
 #    warning "CONFIG_MM_REGIONS < 2: Available AHB SRAM Bank(s) not included in HEAP"
 #  endif
-#  if CONFIG_MM_REGIONS > 2
+#  if CONFIG_MM_REGIONS > 3
 #    warning "CONFIG_MM_REGIONS > 2: Are additional regions handled by application?"
 #  endif
 #else
@@ -339,5 +343,13 @@ void up_addregion(void)
    kumm_addregion((FAR void*)LPC17_AHB_HEAPBASE, LPC17_AHB_HEAPSIZE);
 
 #endif
+
+#if CONFIG_MM_REGIONS > 2
+  #if defined(CONFIG_LPC17_EXTDRAM) && defined(CONFIG_LPC17_EXTDRAMHEAP)
+   kmm_addregion((FAR void*)LPC17_EXTSDRAM_HEAPBASE,
+                 (CONFIG_LPC17_EXTDRAMSIZE)*1024*1024);
+  #endif
+#endif
+
 }
 #endif
