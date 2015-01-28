@@ -414,7 +414,7 @@ config LPC17_EXTDRAM
 if LPC17_EXTDRAM
 
 config LPC17_EXTDRAMBASE
-	int "External SDRAM base addr"
+	hex "External SDRAM base addr"
 	default 0xa0000000
 	---help---
 		Base addr of the external SDRAM in bytes.
