@@ -172,6 +172,43 @@
 #define GPIO_UART1_TXD             GPIO_UART1_TXD_1
 #define GPIO_UART1_RXD             GPIO_UART1_RXD_1
 
+/* LCD: R,G,B - 5,6,5
+ *
+ * pin0 : red   VD3  -- Connected to P2[9]
+ * pin1 : red   VD4  -- Connected to P2[6]
+ * pin2 : red   VD5  -- Connected to P2[7]
+ * pin3 : red   VD6  -- Connected to P4[28]
+ * pin4 : red   VD7  -- Connected to P4[29]
+ * pin5 : green VD10 -- Connected to P1[20]
+ * pin6 : green VD11 -- Connected to P1[21]
+ * pin7 : green VD12 -- Connected to P1[22]
+ * pin8 : green VD13 -- Connected to P1[23]
+ * pin9 : green VD14 -- Connected to P1[24]
+ * pin10: green VD15 -- Connected to P1[25]
+ * pin11: blue  VD19 -- Connected to P2[13]
+ * pin12: blue  VD20 -- Connected to P1[26]
+ * pin13: blue  VD21 -- Connected to P1[27]
+ * pin14: blue  VD22 -- Connected to P1[28]
+ * pin15: blue  VD23 -- Connected to P1[29]
+ */
+
+#define GPIO_LCD_VD0                GPIO_LCD_VD3_1
+#define GPIO_LCD_VD1                GPIO_LCD_VD4_1
+#define GPIO_LCD_VD2                GPIO_LCD_VD5_1
+#define GPIO_LCD_VD3                GPIO_LCD_VD6_3
+#define GPIO_LCD_VD4                GPIO_LCD_VD7_3
+#define GPIO_LCD_VD5                GPIO_LCD_VD10_1
+#define GPIO_LCD_VD6                GPIO_LCD_VD11_1
+#define GPIO_LCD_VD7                GPIO_LCD_VD12_1
+#define GPIO_LCD_VD8                GPIO_LCD_VD13_1
+#define GPIO_LCD_VD9                GPIO_LCD_VD14_1
+#define GPIO_LCD_VD10               GPIO_LCD_VD15_1
+#define GPIO_LCD_VD11               GPIO_LCD_VD19
+#define GPIO_LCD_VD12               GPIO_LCD_VD20
+#define GPIO_LCD_VD13               GPIO_LCD_VD21
+#define GPIO_LCD_VD14               GPIO_LCD_VD22
+#define GPIO_LCD_VD15               GPIO_LCD_VD23
+
 /************************************************************************************
  * Public Types
  ************************************************************************************/
