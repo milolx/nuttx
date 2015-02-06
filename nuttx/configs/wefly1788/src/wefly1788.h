@@ -7,6 +7,7 @@
 
 #include <nuttx/config.h>
 #include <nuttx/compiler.h>
+#include <lpc17_gpio.h>
 
 /************************************************************************************
  * Definitions
@@ -17,7 +18,7 @@
  * reconfigure this pin as normal GPIO input if NAND is used.
  */
 
-//#define GPIO_NAND_RB     (GPIO_INPUT | GPIO_PULLUP | GPIO_PORT2 | GPIO_PIN21)
+#define GPIO_NAND_RB     (GPIO_INPUT | GPIO_PULLUP | GPIO_PORT2 | GPIO_PIN21)
 
 /* If CONFIG_ARCH_LEDS is not defined, then the user can control the LEDs in
  * any way.  The following definitions are used to access individual LEDs.

@@ -9,6 +9,10 @@ ifeq ($(CONFIG_LPC17_EMC),y)
 ifeq ($(CONFIG_LPC17_EXTDRAM),y)
   CSRCS += lpc17_sdraminitialize.c
 endif
+ifeq ($(CONFIG_LPC17_EXTNAND),y)
+  CSRCS += lpc17_nandinitialize.c
+  CSRCS += lpc17_nand.c
+endif
 endif
 
 ifeq ($(CONFIG_LPC17_LCD),y)
