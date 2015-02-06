@@ -18,6 +18,7 @@
 #include "lpc17_sdcard.h"
 #include "lpc17_usbhost.h"
 #include "../include/board.h"
+#include "lpc17_nand.h"
 
 /****************************************************************************
  * Pre-Processor Definitions
@@ -324,6 +325,8 @@ static int nsh_usbhostinitialize(void)
 int nsh_archinitialize(void)
 {
   int ret;
+
+  lpc17_nand_automount();
 
   /* Initialize SPI-based microSD */
 
