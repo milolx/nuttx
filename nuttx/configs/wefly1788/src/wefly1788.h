@@ -82,6 +82,16 @@
 
 #define GPIO_LCD_BL      (GPIO_OUTPUT | GPIO_VALUE_ZERO | GPIO_PORT2 | GPIO_PIN1)
 
+/* ABME2000 */
+#define GPIO_AMBE_CLK    GPIO_SSP0_SCK_3
+#define GPIO_AMBE_STRB   GPIO_SSP0_SSEL_4
+#define GPIO_AMBE_RXDATA GPIO_SSP0_MISO_2
+#define GPIO_AMBE_TXDATA GPIO_SSP0_MOSI_4
+
+#define GPIO_SSP0_SCK    GPIO_AMBE_CLK
+#define GPIO_SSP0_MISO   GPIO_AMBE_RXDATA
+#define GPIO_SSP0_MOSI   GPIO_AMBE_TXDATA
+
 /* XPT2046 Touchscreen **************************************************************/
 /* -------------- -------------------- ------------ --------------------------------
  * XTPT2046       Module               Module       wefly1788 LED
