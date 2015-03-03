@@ -195,9 +195,9 @@
 #define GPIO_LCD_VD0                GPIO_LCD_VD3_1
 #define GPIO_LCD_VD1                GPIO_LCD_VD4_1
 #define GPIO_LCD_VD2                GPIO_LCD_VD5_1
-#define GPIO_LCD_VD3                GPIO_LCD_VD6_3
+#define GPIO_LCD_VD3                GPIO_LCD_VD6_1
 #define GPIO_LCD_VD4                GPIO_LCD_VD7_3
-#define GPIO_LCD_VD5                GPIO_LCD_VD10_1
+#define GPIO_LCD_VD5                GPIO_LCD_VD10_3
 #define GPIO_LCD_VD6                GPIO_LCD_VD11_1
 #define GPIO_LCD_VD7                GPIO_LCD_VD12_1
 #define GPIO_LCD_VD8                GPIO_LCD_VD13_1
