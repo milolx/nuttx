@@ -19,6 +19,11 @@ ifeq ($(CONFIG_NSH_LIBRARY),y)
   CSRCS += lpc17_nsh.c
 endif
 
+ifeq ($(CONFIG_ARCH_BOARD_AMBE2K),y)
+  CSRCS += lpc17_ambe2k.c
+endif
+
+
 AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
 

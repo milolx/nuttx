@@ -335,5 +335,7 @@ int nsh_archinitialize(void)
       ret = nsh_usbhostinitialize();
     }
 
+  ambe2k_initialize();
+
   return ret;
 }

@@ -1109,6 +1109,12 @@ config ARCH_BOARD
 	default "sim"                      if ARCH_BOARD_SIM
 
 comment "Common Board Options"
+config ARCH_BOARD_AMBE2K
+	bool "AMBE2000 support"
+	depends on ARCH_BOARD_WEFLY1788
+	---help---
+		AMBE2000 driver (including ssp)
+
 
 config ARCH_HAVE_LEDS
 	bool
