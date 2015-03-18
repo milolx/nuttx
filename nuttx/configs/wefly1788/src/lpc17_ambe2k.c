@@ -27,13 +27,15 @@
 #include "lpc17_gpio.h"
 #include "wefly1788.h"
 
+#define GPIO_xx    (GPIO_OUTPUT | GPIO_VALUE_ONE | GPIO_PORT3 | GPIO_PIN24)
+
 /* SSP Clocking *************************************************************/
 
 /* All peripherals are clocked by the same peripheral clock in the LPC178x
  * family.
  */
 #define SSP_CLOCK		BOARD_PCLK_FREQUENCY
-#define AMBE2K_FRAME_PERIOD	(18*1000)		// in us
+#define AMBE2K_FRAME_PERIOD	(8*1000)		// in us
 
 /****************************************************************************
  * Private Types
@@ -257,6 +259,9 @@ static void ssp_recv_rx_fifo(ambe2k_dev_t *dev)
 		if (dev->pos_r < 0) {
 			// a frame should start with AMBE2K_HDR
 			if (val == AMBE2K_HDR) {
+				static int x=1;
+				x=!x;
+	lpc17_gpiowrite(GPIO_xx, x);
 				dev->pos_r = 0;
 				// we can send actual data *now*
 				dev->send_data = 1;
@@ -506,7 +511,7 @@ static int lpc17_ssp_init(ambe2k_dev_t *dev)
 	ssp_putreg(&dev->sspdev, LPC17_SSP_IMSC_OFFSET, SSP_INT_RT|SSP_INT_RX);
 
 	/* Select frequency of approx. 1800KHz (MAX 2.048MHz) */
-	ssp_setfrequency(&dev->sspdev, 1800*1000);
+	ssp_setfrequency(&dev->sspdev, 100*1000);
 
 	/* Enable port */
 	regval = ssp_getreg(&dev->sspdev, LPC17_SSP_CR1_OFFSET);
@@ -605,10 +610,11 @@ int ambe2k_initialize(void)
 	sem_init(&g_dev.sem_frm_s, 0, 1);
 	sem_init(&g_dev.sem_frm_r, 0, 1);
 
-	lpc17_configgpio(GPIO_AMBE2K_TEST);
-
 	lpc17_configgpio(GPIO_AMBE2K_RST);
 	lpc17_gpiowrite(GPIO_AMBE2K_RST, 1);
+
+	lpc17_configgpio(GPIO_xx);
+	lpc17_gpiowrite(GPIO_xx, 1);
 
 	lpc17_timer_init(&g_dev);
 	lpc17_ssp_init(&g_dev);
