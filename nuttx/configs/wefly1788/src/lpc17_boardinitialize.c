@@ -83,7 +83,7 @@ void board_initialize(void)
 
   lpc17_configgpio(GPIO_ENET_RST);
   lpc17_gpiowrite(GPIO_ENET_RST, 0);
-  up_udelay(10000);
+  up_mdelay(50);
   lpc17_gpiowrite(GPIO_ENET_RST, 1);
 
 #if defined(CONFIG_NSH_LIBRARY) && !defined(CONFIG_NSH_ARCHINIT)
