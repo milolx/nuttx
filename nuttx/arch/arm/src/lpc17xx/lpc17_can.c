@@ -1244,6 +1244,7 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval |= SYSCON_PCONP_PCCAN1;
       can_putcommon(LPC17_SYSCON_PCONP, regval);
 
+#ifndef CONFIG_ARCH_FAMILY_LPC178X
       /* Enable clocking to the CAN module (not necessary... already done
        * in low level clock configuration logic).
        */
@@ -1252,6 +1253,7 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval &= ~SYSCON_PCLKSEL0_CAN1_MASK;
       regval |= (CAN1_CCLK_DIVISOR << SYSCON_PCLKSEL0_CAN1_SHIFT);
       can_putcommon(LPC17_SYSCON_PCLKSEL0, regval);
+#endif
 
       /* Configure CAN GPIO pins */
 
@@ -1271,6 +1273,7 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval |= SYSCON_PCONP_PCCAN2;
       can_putcommon(LPC17_SYSCON_PCONP, regval);
 
+#ifndef CONFIG_ARCH_FAMILY_LPC178X
       /* Enable clocking to the CAN module (not necessary... already done
        * in low level clock configuration logic).
        */
@@ -1279,6 +1282,7 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval &= ~SYSCON_PCLKSEL0_CAN2_MASK;
       regval |= (CAN2_CCLK_DIVISOR << SYSCON_PCLKSEL0_CAN2_SHIFT);
       can_putcommon(LPC17_SYSCON_PCLKSEL0, regval);
+#endif
 
       /* Configure CAN GPIO pins */
 
