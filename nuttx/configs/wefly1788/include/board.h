@@ -209,6 +209,17 @@
 #define GPIO_LCD_VD14               GPIO_LCD_VD22
 #define GPIO_LCD_VD15               GPIO_LCD_VD23
 
+/* CAN1/2 GPIO
+ * 1 rx-> P0[0]
+ * 1 tx-> P0[1]
+ * 2 rx-> P0[4]
+ * 2 tx-> P0[5]
+ */
+#define GPIO_CAN1_RD  GPIO_CAN1_RD_1
+#define GPIO_CAN1_TD  GPIO_CAN1_TD_1
+#define GPIO_CAN2_RD  GPIO_CAN2_RD_1
+#define GPIO_CAN2_TD  GPIO_CAN2_TD_1
+
 /************************************************************************************
  * Public Types
  ************************************************************************************/
