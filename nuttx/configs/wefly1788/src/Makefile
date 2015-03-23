@@ -19,6 +19,10 @@ ifeq ($(CONFIG_NSH_LIBRARY),y)
   CSRCS += lpc17_nsh.c
 endif
 
+ifeq ($(CONFIG_CAN),y)
+  CSRCS += lpc17_can.c
+endif
+
 AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
 
