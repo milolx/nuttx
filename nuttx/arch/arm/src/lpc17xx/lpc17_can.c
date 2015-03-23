@@ -180,11 +180,6 @@
 #  define canllvdbg(x...)
 #endif
 
-/* Timing *******************************************************************/
-/* CAN clocking is provided at CCLK divided by the configured divisor */
-
-#define CAN_CLOCK_FREQUENCY(d) ((uint32_t)LPC17_CCLK / (uint32_t)(d))
-
 /****************************************************************************
  * Private Types
  ****************************************************************************/
@@ -812,6 +807,7 @@ static int can_send(FAR struct can_dev_s *dev, FAR struct can_msg_s *msg)
       can_putreg(priv, LPC17_CAN_CMR_OFFSET, CAN_CMR_STB1 | CAN_CMR_TR);
 #endif
     }
+#if 0
   else if ((regval & CAN_SR_TBS2) != 0)
     {
       /* Make sure that buffer 2 TX interrupts are enabled BEFORE sending the
@@ -872,6 +868,7 @@ static int can_send(FAR struct can_dev_s *dev, FAR struct can_msg_s *msg)
       can_putreg(priv, LPC17_CAN_CMR_OFFSET, CAN_CMR_STB3 | CAN_CMR_TR);
 #endif
     }
+#endif
   else
     {
       candbg("No available transmission buffer, SR: %08x\n", regval);
@@ -1114,7 +1111,7 @@ static int can12_interrupt(int irq, void *context)
  *   Tq = brp * Tcan
  *
  * Where:
- *   Tcan is the period of the APB clock (PCLK = CCLK / CONFIG_CAN1_DIVISOR).
+ *   Tcan is the period of the APB clock (PCLK).
  *
  * Input Parameter:
  *   priv - A reference to the CAN block status
@@ -1134,7 +1131,7 @@ static int can_bittiming(struct up_dev_s *priv)
   uint32_t sjw;
 
   canllvdbg("CAN%d PCLK: %d baud: %d\n", priv->port,
-            CAN_CLOCK_FREQUENCY(priv->divisor), priv->baud);
+            BOARD_PCLK_FREQUENCY, priv->baud);
 
   /* Try to get CAN_BIT_QUANTA quanta in one bit_time.
    *
@@ -1150,7 +1147,7 @@ static int can_bittiming(struct up_dev_s *priv)
    * First, calculate the number of CAN clocks in one bit time: Fcan / baud
    */
 
-  nclks = CAN_CLOCK_FREQUENCY(priv->divisor) / priv->baud;
+  nclks = BOARD_PCLK_FREQUENCY / priv->baud;
   if (nclks < CAN_BIT_QUANTA)
     {
       /* At the smallest brp value (1), there are already too few bit times
@@ -1244,17 +1241,6 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval |= SYSCON_PCONP_PCCAN1;
       can_putcommon(LPC17_SYSCON_PCONP, regval);
 
-#ifndef CONFIG_ARCH_FAMILY_LPC178X
-      /* Enable clocking to the CAN module (not necessary... already done
-       * in low level clock configuration logic).
-       */
-
-      regval  = can_getcommon(LPC17_SYSCON_PCLKSEL0);
-      regval &= ~SYSCON_PCLKSEL0_CAN1_MASK;
-      regval |= (CAN1_CCLK_DIVISOR << SYSCON_PCLKSEL0_CAN1_SHIFT);
-      can_putcommon(LPC17_SYSCON_PCLKSEL0, regval);
-#endif
-
       /* Configure CAN GPIO pins */
 
       lpc17_configgpio(GPIO_CAN1_RD);
@@ -1272,17 +1258,6 @@ FAR struct can_dev_s *lpc17_caninitialize(int port)
       regval  = can_getcommon(LPC17_SYSCON_PCONP);
       regval |= SYSCON_PCONP_PCCAN2;
       can_putcommon(LPC17_SYSCON_PCONP, regval);
-
-#ifndef CONFIG_ARCH_FAMILY_LPC178X
-      /* Enable clocking to the CAN module (not necessary... already done
-       * in low level clock configuration logic).
-       */
-
-      regval  = can_getcommon(LPC17_SYSCON_PCLKSEL0);
-      regval &= ~SYSCON_PCLKSEL0_CAN2_MASK;
-      regval |= (CAN2_CCLK_DIVISOR << SYSCON_PCLKSEL0_CAN2_SHIFT);
-      can_putcommon(LPC17_SYSCON_PCLKSEL0, regval);
-#endif
 
       /* Configure CAN GPIO pins */
 
