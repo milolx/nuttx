@@ -335,5 +335,7 @@ int nsh_archinitialize(void)
       ret = nsh_usbhostinitialize();
     }
 
+  can_devinit();
+
   return ret;
 }
