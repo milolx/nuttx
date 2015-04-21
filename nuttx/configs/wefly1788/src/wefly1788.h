@@ -80,7 +80,7 @@
 /* LCD ******************************************************************************/
 /* Backlight enable, P2[1].  Initial state is OFF (zero) */
 
-//#define GPIO_LCD_BL      (GPIO_OUTPUT | GPIO_VALUE_ZERO | GPIO_PORT2 | GPIO_PIN1)
+#define GPIO_LCD_BL      (GPIO_OUTPUT | GPIO_VALUE_ONE | GPIO_PORT3 | GPIO_PIN24)
 
 /* XPT2046 Touchscreen **************************************************************/
 /* -------------- -------------------- ------------ --------------------------------
