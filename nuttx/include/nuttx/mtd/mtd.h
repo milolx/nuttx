@@ -160,6 +160,9 @@ struct mtd_dev_s
 
   FAR const char *name;
 #endif
+#ifdef CONFIG_FS_YAFFS2
+  struct nand_raw_s *raw;
+#endif
 };
 
 /****************************************************************************
