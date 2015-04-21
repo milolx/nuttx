@@ -1,0 +1,1 @@
+../../../fs/yaffs2/yaffsfs.h
