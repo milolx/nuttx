@@ -38,7 +38,9 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
+#include <nuttx/fs/yaffsfs.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 /****************************************************************************
  * Definitions
@@ -62,6 +64,53 @@ int main(int argc, FAR char *argv[])
 int hello_main(int argc, char *argv[])
 #endif
 {
+  char mountpt[] = "/nand";
+  int h;
+  int wrote;
+  static char buffer[1000];
+  char fn[100];
+
+#if 0
+  sprintf(fn, "%s/text", mountpt);
+  yaffs_mount(mountpt);
+#endif
+
+#if 0
+  h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
+  printf("h=%d\n", h);
+  wrote = yaffs_write(h, buffer, sizeof(buffer));
+  printf("wrote=%d\n", wrote);
+  //yaffs_unlink(fn);
+  yaffs_close(h);
+#endif
+#if 1
+  {
+	  int i;
+	  int fsize;
+	  for(i = 1; i < 2000; i++) {
+		  sprintf(fn,"%s/f%d",mountpt, i);
+		  fsize = (i%10) * 10000 + 20000;
+		  h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
+		  while (fsize > 0) {
+			  wrote = yaffs_write(h, buffer, sizeof(buffer));
+			  if (wrote != sizeof(buffer)) {
+				  printf("Writing file %s, only wrote %d bytes\n", fn, wrote);
+				  break;
+			  }
+			  fsize -= wrote;
+		  }
+		  yaffs_unlink(fn);
+		  yaffs_close(h);
+	  }
+#endif
+
+  }
+
   printf("Hello, World!!\n");
+
+#if 1
+  yaffs_unmount(mountpt);
+#endif
+
   return 0;
 }
