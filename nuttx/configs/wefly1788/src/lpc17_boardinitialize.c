@@ -3,6 +3,7 @@
  ************************************************************************************/
 
 #include <nuttx/config.h>
+#include <stdio.h>
 
 #include <debug.h>
 
@@ -83,5 +84,57 @@ void board_initialize(void)
 #if defined(CONFIG_NSH_LIBRARY) && !defined(CONFIG_NSH_ARCHINIT)
   (void)nsh_archinitialize();
 #endif
+}
+#endif
+
+#ifdef CONFIG_DEBUG
+#define ROUND_DOWN(X, Y) ((X) / (Y) * (Y))
+void hexdump(const void *buf_, size_t size, uint16_t ofs)
+{
+	const uint8_t *buf = buf_;
+	const size_t per_line = 16; /* Maximum bytes per line. */
+
+	printf("addr->%08x, size->%d\n", buf+ofs, size);
+	while (size > 0) {
+		size_t start, end, n;
+		size_t i;
+
+		/* Number of bytes on this line. */
+		start = ofs % per_line;
+		end = per_line;
+		if (end - start > size)
+			end = start + size;
+		n = end - start;
+
+		/* Print line. */
+		printf("%08x  ",  buf+ofs);
+		for (i = 0; i < start; i++) {
+			printf("   ");
+		}
+		for (; i < end; i++) {
+			printf("%02x%c", buf[i - start], i == per_line / 2 - 1? '-' : ' ');
+		}
+		for (; i < per_line; i++)
+			printf("   ");
+		printf("|");
+		for (i = 0; i < start; i++)
+			printf(" ");
+		for (; i < end; i++) {
+			int c = buf[i - start];
+			printf("%c", c >= 32 && c < 127 ? c : '.');
+		}
+		for (; i < per_line; i++)
+			printf(" ");
+		printf("|");
+		printf("\n");
+
+		ofs += n;
+		buf += n;
+		size -= n;
+	}
+}
+#else
+void hexdump(const void *buf_, size_t size, uint16_t ofs)
+{
 }
 #endif
