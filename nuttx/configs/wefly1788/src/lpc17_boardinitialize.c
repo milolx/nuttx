@@ -15,6 +15,8 @@
 
 #include "../include/board.h"
 #include "wefly1788.h"
+#include <nuttx/arch.h>
+#include "lpc17_gpio.h"
 
 /************************************************************************************
  * Definitions
@@ -79,6 +81,11 @@ void board_initialize(void)
    * alternative NSH initialization is necessary when NSH is ran in user-space
    * but the initialization function must run in kernel space.
    */
+
+  lpc17_configgpio(GPIO_ENET_RST);
+  lpc17_gpiowrite(GPIO_ENET_RST, 0);
+  up_mdelay(50);
+  lpc17_gpiowrite(GPIO_ENET_RST, 1);
 
 #if defined(CONFIG_NSH_LIBRARY) && !defined(CONFIG_NSH_ARCHINIT)
   (void)nsh_archinitialize();
