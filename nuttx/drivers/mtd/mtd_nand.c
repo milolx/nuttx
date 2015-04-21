@@ -944,9 +944,11 @@ FAR struct mtd_dev_s *nand_initialize(FAR struct nand_raw_s *raw)
             model->scheme = &g_nand_sparescheme2048;
             break;
 
+#if 0
           case 4096:
             model->scheme = &g_nand_sparescheme4096;
             break;
+#endif
         }
 
       /* Disable any internal, embedded ECC function */

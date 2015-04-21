@@ -91,7 +91,9 @@ extern "C"
 EXTERN const struct nand_scheme_s g_nand_sparescheme256;
 EXTERN const struct nand_scheme_s g_nand_sparescheme512;
 EXTERN const struct nand_scheme_s g_nand_sparescheme2048;
+#if 0
 EXTERN const struct nand_scheme_s g_nand_sparescheme4096;
+#endif
 
 /****************************************************************************
  * Public Function Prototypes
