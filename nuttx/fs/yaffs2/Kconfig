@@ -1,0 +1,20 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config FS_YAFFS2
+	bool "YAFFS2 file system"
+	default n
+	depends on !DISABLE_MOUNTPOINT
+	select FS_READABLE
+	select FS_WRITABLE
+	select YAFFS_DIRECT
+	select YAFFS_DEFINES_TYPES
+	select YAFFS_PROVIDE_DEFS
+	select YAFFSFS_PROVIDE_VALUES
+	---help---
+		Enable NuttX YAFFS2 file system support.
+
+if FS_YAFFS2
+endif

@@ -1,0 +1,16 @@
+ifeq ($(CONFIG_FS_YAFFS2),y)
+ASRCS +=
+CSRCS += yaffs_allocator.c yaffs_attribs.c yaffs_bitmap.c yaffs_checkptrw.c \
+		yaffs_ecc.c yaffs_error.c yaffsfs.c yaffs_guts.c \
+		yaffs_hweight.c yaffs_nameval.c yaffs_nand.c \
+		yaffs_packedtags1.c yaffs_packedtags2.c yaffs_qsort.c \
+		yaffs_summary.c yaffs_tagscompat.c yaffs_tagsmarshall.c \
+		yaffs_verify.c yaffs_yaffs1.c yaffs_yaffs2.c yaffs_mtdif.c \
+		yaffs_initialize.c
+
+# Include YAFFS2 build support
+
+DEPPATH += --dep-path yaffs2
+VPATH += :yaffs2
+
+endif

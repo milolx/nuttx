@@ -64,7 +64,9 @@ const struct nand_model_s g_nandmodels[NAND_NMODELS] =
 
     {0x6e,   NANDMODEL_DATAWIDTH8,            256,  0,        1,      4,  &g_nand_sparescheme256},
     {0x64,   NANDMODEL_DATAWIDTH8,            256,  0,        2,      4,  &g_nand_sparescheme256},
+#if 0
     {0x68,   NANDMODEL_DATAWIDTH8,           4096,  0,      224,   1024,  &g_nand_sparescheme4096},
+#endif
     {0x6b,   NANDMODEL_DATAWIDTH8,            512,  0,        4,      8,  &g_nand_sparescheme512},
     {0xe8,   NANDMODEL_DATAWIDTH8,            256,  0,        1,      4,  &g_nand_sparescheme256},
     {0xec,   NANDMODEL_DATAWIDTH8,            256,  0,        1,      4,  &g_nand_sparescheme256},
@@ -164,7 +166,9 @@ const struct nand_model_s g_nandmodels[NAND_NMODELS] =
     {0xD5,   NANDMODEL_DATAWIDTH8  | OPTIONS, 0,    0,     2048,      0,  &g_nand_sparescheme2048},
     {0xB5,   NANDMODEL_DATAWIDTH16 | OPTIONS, 0,    0,     2048,      0,  &g_nand_sparescheme2048},
     {0xC5,   NANDMODEL_DATAWIDTH16 | OPTIONS, 0,    0,     2048,      0,  &g_nand_sparescheme2048},
+#if 0
     {0x38,   NANDMODEL_DATAWIDTH8  | OPTIONS, 0,    0,     1024,      0,  &g_nand_sparescheme4096}
+#endif
 
 /*----------|------------------------------+------+-------+------+-------+------------------------*/
 };

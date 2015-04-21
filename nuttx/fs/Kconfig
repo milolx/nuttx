@@ -48,6 +48,22 @@ config FS_WRITABLE
 	bool
 	default n
 
+config YAFFS_DIRECT
+	bool
+	default n
+
+config YAFFS_DEFINES_TYPES
+	bool
+	default n
+
+config YAFFS_PROVIDE_DEFS
+	bool
+	default n
+
+config YAFFSFS_PROVIDE_VALUES
+	bool
+	default n
+
 source fs/aio/Kconfig
 source fs/semaphore/Kconfig
 source fs/mqueue/Kconfig
@@ -56,6 +72,7 @@ source fs/mmap/Kconfig
 source fs/fat/Kconfig
 source fs/nfs/Kconfig
 source fs/nxffs/Kconfig
+source fs/yaffs2/Kconfig
 source fs/romfs/Kconfig
 source fs/smartfs/Kconfig
 source fs/binfs/Kconfig

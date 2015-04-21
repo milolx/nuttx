@@ -92,7 +92,11 @@ static int      nand_lock(FAR struct nand_dev_s *nand);
 
 #ifdef CONFIG_MTD_NAND_BLOCKCHECK
 static int     nand_checkblock(FAR struct nand_dev_s *nand, off_t block);
+#  if defined(CONFIG_DEBUG_VERBOSE) && defined(CONFIG_DEBUG_FS)
 static int     nand_devscan(FAR struct nand_dev_s *nand);
+#  else
+#    define    nand_devscan(n) (0)
+#  endif
 #else
 #  define      nand_checkblock(n,b) (GOODBLOCK)
 #  define      nand_devscan(n) (0)
@@ -940,9 +944,11 @@ FAR struct mtd_dev_s *nand_initialize(FAR struct nand_raw_s *raw)
             model->scheme = &g_nand_sparescheme2048;
             break;
 
+#if 0
           case 4096:
             model->scheme = &g_nand_sparescheme4096;
             break;
+#endif
         }
 
       /* Disable any internal, embedded ECC function */

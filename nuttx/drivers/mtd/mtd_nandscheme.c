@@ -134,6 +134,7 @@ const struct nand_scheme_s g_nand_sparescheme2048 =
    38, 39}
 };
 
+#if 0
 /* Spare area placement scheme for 4096 byte pages. */
 
 const struct nand_scheme_s g_nand_sparescheme4096 =
@@ -165,6 +166,7 @@ const struct nand_scheme_s g_nand_sparescheme4096 =
    56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73,
    74, 75, 76, 77, 78, 79}
 };
+#endif
 
 /****************************************************************************
  * Public Functions
@@ -214,7 +216,8 @@ void nandscheme_readbadblockmarker(FAR const struct nand_scheme_s *scheme,
 void nandscheme_writebadblockmarker(FAR const struct nand_scheme_s *scheme,
                                     FAR uint8_t *spare, uint8_t marker)
 {
-  spare[scheme->bbpos] = marker;
+  spare[scheme->bbpos]   = marker;
+  spare[scheme->bbpos+1] = marker;
 }
 
 /****************************************************************************
@@ -294,7 +297,7 @@ void nandscheme_readextra(FAR const struct nand_scheme_s *scheme,
                           FAR const uint8_t *spare, FAR void *extra,
                           unsigned int size, unsigned int offset)
 {
-  DEBUGASSERT((size + offset) < scheme->nxbytes);
+  DEBUGASSERT((size + offset) <= scheme->nxbytes);
 
   int i;
 
@@ -305,7 +308,7 @@ void nandscheme_readextra(FAR const struct nand_scheme_s *scheme,
 }
 
 /****************************************************************************
- * Name: nandscheme_readextra
+ * Name: nandscheme_writeextra
  *
  * Description:
  *   Write extra bytes of information inside a spare area, using the provided
@@ -327,7 +330,7 @@ void nandscheme_writeextra(FAR const struct nand_scheme_s *scheme,
                            FAR uint8_t *spare, FAR const void *extra,
                            unsigned int size, unsigned int offset)
 {
-    DEBUGASSERT((size + offset) < scheme->nxbytes);
+    DEBUGASSERT((size + offset) <= scheme->nxbytes);
 
     uint32_t i;
     for (i = 0; i < size; i++) {
@@ -335,50 +338,3 @@ void nandscheme_writeextra(FAR const struct nand_scheme_s *scheme,
         spare[scheme->xbytepos[i+offset]] = ((uint8_t *) extra)[i];
     }
 }
-
-/****************************************************************************
- * Name: nandscheme_readextra
- *
- * Description:
- *   Build a scheme instance for 4096 page size nand flash
- *
- * Input Parameters:
- *   scheme  Pointer to a nand_scheme_s instance.
- *   spareSize Size of spare area.
- *   offset  Index where to write the first extra byte.
- *   size    Number of extra bytes to write.
- *   offset  Index where to write the first extra byte.
- *
- * Returned Values:
- *   OK on success; a negated errno value on failure.
- *
- ****************************************************************************/
-
-int nandscheme_build4086(FAR struct nand_scheme_s *scheme,
-                         unsigned int spareSize, unsigned int eccOffset)
-{
-  uint8_t eccsize = g_nand_sparescheme4096.eccsize;
-  int i;
-
-  if ((eccOffset + eccsize) > spareSize)
-    {
-      return -E2BIG;
-    }
-
-  scheme->bbpos   = g_nand_sparescheme4096.bbpos;
-  scheme->eccsize = eccsize;
-
-  for (i = 0; i < eccsize; i++)
-    {
-      scheme->eccbytepos[i] = eccOffset + i;
-    }
-
-  scheme->nxbytes = spareSize - eccsize - 2;
-
-  for (i = 0; i < scheme->nxbytes; i++)
-    {
-      scheme->xbytepos[i] = 2 + i;
-    }
-
-  return OK;
-};
