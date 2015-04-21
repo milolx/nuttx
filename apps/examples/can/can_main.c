@@ -1,42 +1,3 @@
-/****************************************************************************
- * examples/can/can_main.c
- *
- *   Copyright (C) 2011 Gregory Nutt. All rights reserved.
- *   Author: Gregory Nutt <gnutt@nuttx.org>
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- * 3. Neither the name NuttX nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- ****************************************************************************/
-
-/****************************************************************************
- * Included Files
- ****************************************************************************/
-
 #include <nuttx/config.h>
 
 #include <sys/types.h>
@@ -48,259 +9,124 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <debug.h>
+#include <pthread.h>
 
 #include <nuttx/can.h>
 
-#include "can.h"
+#define CONFIG_EXAMPLES_CAN_READWRITE 1
+#define CAN_OFLAGS O_RDWR
 
-/****************************************************************************
- * Pre-processor Definitions
- ****************************************************************************/
+#define MAX_ID (1 << 11)
+#define CANID	88
 
-#if defined(CONFIG_EXAMPLES_CAN_READONLY)
-#  undef CONFIG_EXAMPLES_CAN_WRITEONLY
-#  undef CONFIG_EXAMPLES_CAN_READWRITE
-#  define CAN_OFLAGS O_RDONLY
-#elif defined(CONFIG_EXAMPLES_CAN_WRITEONLY)
-#  undef CONFIG_EXAMPLES_CAN_READWRITE
-#  define CAN_OFLAGS O_WRONLY
-#else
-#  undef CONFIG_EXAMPLES_CAN_READWRITE
-#  define CONFIG_EXAMPLES_CAN_READWRITE 1
-#  define CAN_OFLAGS O_RDWR
-#endif
+uint32_t tot = 0;
 
-#ifdef CONFIG_CAN_EXTID
-#  define MAX_ID (1 << 29)
-#else
-#  define MAX_ID (1 << 11)
-#endif
-
-/****************************************************************************
- * Private Types
- ****************************************************************************/
-
-/****************************************************************************
- * Private Function Prototypes
- ****************************************************************************/
-
-/****************************************************************************
- * Private Data
- ****************************************************************************/
-
-/****************************************************************************
- * Public Data
- ****************************************************************************/
-
-/****************************************************************************
- * Private Functions
- ****************************************************************************/
-
-/****************************************************************************
- * Public Functions
- ****************************************************************************/
-
-/****************************************************************************
- * Name: can_main
- ****************************************************************************/
-
-#ifdef CONFIG_BUILD_KERNEL
-int main(int argc, FAR char *argv[])
-#else
-int can_main(int argc, char *argv[])
-#endif
+static void *thread_func_s(void *parameter)
 {
-#ifndef CONFIG_EXAMPLES_CAN_READONLY
-  struct can_msg_s txmsg;
-#ifdef CONFIG_CAN_EXTID
-  uint32_t msgid;
-#else
-  uint16_t msgid;
-#endif
-  int msgdlc;
-  uint8_t msgdata;
-#endif
+	int fd = *((int *)parameter);
+	struct can_msg_s txmsg;
 
-#ifndef CONFIG_EXAMPLES_CAN_WRITEONLY
-  struct can_msg_s rxmsg;
-#endif
+	size_t msgsize;
+	ssize_t nbytes;
 
-  size_t msgsize;
-  ssize_t nbytes;
-#if defined(CONFIG_NSH_BUILTIN_APPS) || defined(CONFIG_EXAMPLES_CAN_NMSGS)
-  long nmsgs;
-#endif
+	uint8_t seq=0;
+	int i;
 
-  int fd;
-  int errval = 0;
-  int ret;
-  int i;
+	while (1) {
+		/* Construct the next TX message */
 
-  /* If this example is configured as an NX add-on, then limit the number of
-   * samples that we collect before returning.  Otherwise, we never return
-   */
+		txmsg.cm_hdr.ch_id    = CANID;
+		txmsg.cm_hdr.ch_rtr   = false;
+		txmsg.cm_hdr.ch_dlc   = 8;
 
-#if defined(CONFIG_NSH_BUILTIN_APPS)
-  nmsgs = CONFIG_EXAMPLES_CAN_NMSGS;
-  if (argc > 1)
-    {
-      nmsgs = strtol(argv[1], NULL, 10);
-    }
+		for (i = 0; i < 8; i++)
+			txmsg.cm_data[i] = seq++;
 
-  printf("can_main: nmsgs: %ld\n", nmsgs);
-#elif defined(CONFIG_EXAMPLES_CAN_NMSGS)
-  printf("can_main: nmsgs: %d\n", CONFIG_EXAMPLES_CAN_NMSGS);
-#endif
+		/* Send the TX message */
 
-  /* Initialization of the CAN hardware is performed by logic external to
-   * this test.
-   */
+		msgsize = CAN_MSGLEN(8);
+		nbytes = write(fd, &txmsg, msgsize);
+		if (nbytes != msgsize)
+		{
+			printf("ERROR: write(%ld) returned %ld\n", (long)msgsize, (long)nbytes);
+		}
+		//tot += 8;
+	}
+}
 
-  printf("can_main: Initializing external CAN device\n");
-  ret = can_devinit();
-  if (ret != OK)
-    {
-      printf("can_main: can_devinit failed: %d\n", ret);
-      errval = 1;
-      goto errout;
-    }
+static void *thread_func_r(void *parameter)
+{
+	int fd = *((int *)parameter);
+	struct can_msg_s rxmsg;
+	size_t msgsize;
+	uint8_t exp = 0;
+	ssize_t nbytes;
+	int i;
 
-  /* Open the CAN device for reading */
+	/* Read the RX message */
 
-  printf("can_main: Hardware initialized. Opening the CAN device\n");
-  fd = open(CONFIG_EXAMPLES_CAN_DEVPATH, CAN_OFLAGS);
-  if (fd < 0)
-    {
-      printf("can_main: open %s failed: %d\n",
-              CONFIG_EXAMPLES_CAN_DEVPATH, errno);
-      errval = 2;
-      goto errout_with_dev;
-    }
+	msgsize = sizeof(struct can_msg_s);
+	while (1) {
+		nbytes = read(fd, &rxmsg, msgsize);
+		if (nbytes < CAN_MSGLEN(0) || nbytes > msgsize)
+		{
+			printf("ERROR: read(%ld) returned %ld\n", (long)msgsize, (long)nbytes);
+		}
 
-  /* Now loop the appropriate number of times, performing one loopback test
-   * on each pass.
-   */
+		/* Verify that the received messages are the same */
 
-#ifndef CONFIG_EXAMPLES_CAN_READONLY
-  msgdlc  = 1;
-  msgid   = 1;
-  msgdata = 0;
-#endif
+		if (rxmsg.cm_hdr.ch_id != CANID)
+			printf("ERROR: id mismatch\n");
 
-#if defined(CONFIG_NSH_BUILTIN_APPS)
-  for (; nmsgs > 0; nmsgs--)
-#elif defined(CONFIG_EXAMPLES_CAN_NMSGS)
-  for (nmsgs = 0; nmsgs < CONFIG_EXAMPLES_CAN_NMSGS; nmsgs++)
-#else
-  for (;;)
-#endif
-  {
-    /* Flush any output before the loop entered or from the previous pass
-     * through the loop.
-     */
+		for (i=0; i<8; ++i) {
+			if (rxmsg.cm_data[i] != exp) {
+				printf("data err: %02x exp %02x\n", rxmsg.cm_data[i], exp);
+				exp = rxmsg.cm_data[i];
+			}
 
-    fflush(stdout);
+			++exp;
+		}
+		tot += 8;
+	}
+}
 
-    /* Construct the next TX message */
+int can_main(int argc, char *argv[])
+{
+	int fd;
+	int fd2;
 
-#ifndef CONFIG_EXAMPLES_CAN_READONLY
-    txmsg.cm_hdr.ch_id    = msgid;
-    txmsg.cm_hdr.ch_rtr   = false;
-    txmsg.cm_hdr.ch_dlc   = msgdlc;
-#ifdef CONFIG_CAN_EXTID
-    txmsg.cm_hdr.ch_extid = true;
-#endif
+	pthread_t thread;
+	pthread_t thread2;
 
-    for (i = 0; i < msgdlc; i++)
-      {
-        txmsg.cm_data[i] = msgdata + i;
-      }
+	fd = open("/dev/can0", O_RDWR);
+	if (fd < 0)
+	{
+		printf("can_main: open %s failed: %d\n", "/dev/can0", errno);
+		goto errout;
+	}
 
-    /* Send the TX message */
+	fd2 = open("/dev/can1", O_RDWR);
+	if (fd2 < 0)
+	{
+		printf("can_main: open %s failed: %d\n", "/dev/can1", errno);
+		goto errout_with_dev0;
+	}
 
-    msgsize = CAN_MSGLEN(msgdlc);
-    nbytes = write(fd, &txmsg, msgsize);
-    if (nbytes != msgsize)
-      {
-        printf("ERROR: write(%ld) returned %ld\n", (long)msgsize, (long)nbytes);
-        errval = 3;
-        goto errout_with_dev;
-      }
-#endif
+	pthread_create(&thread, NULL, thread_func_s, (pthread_addr_t)&fd);
+	pthread_create(&thread2, NULL, thread_func_r, (pthread_addr_t)&fd2);
 
-#ifdef CONFIG_EXAMPLES_CAN_WRITEONLY
-    printf("  ID: %4u DLC: %d\n", msgid, msgdlc);
-#endif
+	while (1) {
+		sleep(1);
+		printf("-> %d kB\n", tot/1000);
+	}
 
-    /* Read the RX message */
-
-#ifndef CONFIG_EXAMPLES_CAN_WRITEONLY
-    msgsize = sizeof(struct can_msg_s);
-    nbytes = read(fd, &rxmsg, msgsize);
-    if (nbytes < CAN_MSGLEN(0) || nbytes > msgsize)
-      {
-        printf("ERROR: read(%ld) returned %ld\n", (long)msgsize, (long)nbytes);
-        errval = 4;
-        goto errout_with_dev;
-      }
-#endif
-
-#ifndef CONFIG_EXAMPLES_CAN_READONLY
-    printf("  ID: %4u DLC: %u\n", rxmsg.cm_hdr.ch_id, rxmsg.cm_hdr.ch_dlc);
-#endif
-
-    /* Verify that the received messages are the same */
-
-#ifdef CONFIG_EXAMPLES_CAN_READWRITE
-    if (memcmp(&txmsg.cm_hdr, &rxmsg.cm_hdr, sizeof(struct can_hdr_s)) != 0)
-      {
-        printf("ERROR: Sent header does not match received header:\n");
-        lib_dumpbuffer("Sent header", (FAR const uint8_t*)&txmsg.cm_hdr,
-                       sizeof(struct can_hdr_s));
-        lib_dumpbuffer("Received header", (FAR const uint8_t*)&rxmsg.cm_hdr,
-                       sizeof(struct can_hdr_s));
-        errval = 4;
-        goto errout_with_dev;
-      }
-
-    if (memcmp(txmsg.cm_data, rxmsg.cm_data, msgdlc) != 0)
-      {
-        printf("ERROR: Data does not match. DLC=%d\n", msgdlc);
-        for (i = 0; i < msgdlc; i++)
-          {
-            printf("  %d: TX %02x RX %02x\n", i, txmsg.cm_data[i], rxmsg.cm_data[i]);
-            errval = 5;
-            goto errout_with_dev;
-          }
-      }
-
-    /* Report success */
-
-    printf("  ID: %4u DLC: %d -- OK\n", msgid, msgdlc);
-#endif
-
-    /* Set up for the next pass */
-
-#ifndef CONFIG_EXAMPLES_CAN_READONLY
-    msgdata += msgdlc;
-
-    if (++msgid >= MAX_ID)
-      {
-        msgid = 1;
-      }
-
-    if (++msgdlc > CAN_MAXDATALEN)
-      {
-        msgdlc = 1;
-      }
-#endif
-  }
-
-errout_with_dev:
-  close(fd);
+	close(fd2);
+errout_with_dev0:
+	close(fd);
 
 errout:
-  printf("Terminating!\n");
-  fflush(stdout);
-  return errval;
+	printf("Terminating!\n");
+	fflush(stdout);
+	return 0;
 }
+
