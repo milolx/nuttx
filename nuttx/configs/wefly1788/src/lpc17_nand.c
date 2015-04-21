@@ -14,7 +14,7 @@
 #include <nuttx/mtd/nand.h>
 #include <nuttx/mtd/nand_raw.h>
 #include <nuttx/mtd/nand_model.h>
-#include <nuttx/fs/nxffs.h>
+#include <nuttx/fs/yaffsfs.h>
 #include <sys/mount.h>
 
 #include <nuttx/mtd/mtd.h>
@@ -56,6 +56,7 @@ static void     nand_reset(struct nand_raw_s *raw);
 
 static void nand_wait_ready(struct nand_raw_s *raw)
 {
+	up_udelay(1);
 	while (!lpc17_gpioread(GPIO_NAND_RB));
 }
 
@@ -230,14 +231,18 @@ struct mtd_dev_s *lpc17_nand_initialize(void)
 		fdbg("ERROR: nand_initialize failed\n");
 		return NULL;
 	}
+	mtd->raw = &nand_raw;
 
 	return mtd;
 }
 
 int lpc17_nand_automount(void)
 {
+	extern int yaffs2_initialize(FAR struct mtd_dev_s*);
+
 	FAR struct mtd_dev_s *mtd;
 	static bool initialized = false;
+	static char mountpt[] = "/nand";
 	int ret;
 
 	/* Have we already initialized? */
@@ -259,19 +264,18 @@ int lpc17_nand_automount(void)
 			return ret;
 		}
 
-		/* Initialize to provide NXFFS on the MTD interface */
-		ret = nxffs_initialize(mtd);
+		ret = yaffs2_initialize(mtd);
 		if (ret < 0)
 		{
-			fdbg("ERROR: NXFFS initialization failed: %d\n", ret);
+			fdbg("ERROR: YAFFS initialization failed: %d\n", ret);
 			return ret;
 		}
 
-		/* Mount the file system at /mnt/nand */
-		ret = mount(NULL, "/mnt/nand", "nxffs", 0, NULL);
+		/* Mount the yaffs2 file system */
+		ret = yaffs_mount(mountpt);
 		if (ret < 0)
 		{
-			fdbg("ERROR: Failed to mount the NXFFS volume: %d\n", errno);
+			fdbg("ERROR: Failed to mount the YAFFS\n");
 			return ret;
 		}
 
