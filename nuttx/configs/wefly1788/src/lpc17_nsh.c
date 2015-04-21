@@ -13,6 +13,7 @@
 #include <nuttx/sdio.h>
 #include <nuttx/mmcsd.h>
 #include <nuttx/usb/usbhost.h>
+#include <sys/mount.h>
 
 #include "lpc17_gpio.h"
 #include "lpc17_sdcard.h"
@@ -325,6 +326,14 @@ static int nsh_usbhostinitialize(void)
 int nsh_archinitialize(void)
 {
   int ret;
+
+  /* Mount the procfs at /proc */
+  ret = mount(NULL, "/proc", "procfs", 0, NULL);
+  if (ret < 0)
+    {
+      fdbg("ERROR: Failed to mount the procfs : %d\n", errno);
+      return ret;
+    }
 
   lpc17_nand_automount();
 
