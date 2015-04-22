@@ -335,7 +335,9 @@ int nsh_archinitialize(void)
       return ret;
     }
 
+#ifdef CONFIG_LPC17_EXTNAND
   lpc17_nand_automount();
+#endif
 
   /* Initialize SPI-based microSD */
 
@@ -347,8 +349,13 @@ int nsh_archinitialize(void)
       ret = nsh_usbhostinitialize();
     }
 
+#if defined(LPC17_CAN1) || defined(LPC17_CAN2)
   can_devinit();
+#endif
+
+#ifdef CONFIG_ARCH_BOARD_AMBE2K
   ambe2k_initialize();
+#endif
 
   return ret;
 }

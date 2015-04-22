@@ -83,10 +83,12 @@ void board_initialize(void)
    * but the initialization function must run in kernel space.
    */
 
+#ifdef LPC17_ETHERNET
   lpc17_configgpio(GPIO_ENET_RST);
   lpc17_gpiowrite(GPIO_ENET_RST, 0);
   up_mdelay(50);
   lpc17_gpiowrite(GPIO_ENET_RST, 1);
+#endif
 
 #if defined(CONFIG_NSH_LIBRARY) && !defined(CONFIG_NSH_ARCHINIT)
   (void)nsh_archinitialize();
