@@ -325,6 +325,9 @@ static int nsh_usbhostinitialize(void)
 
 int nsh_archinitialize(void)
 {
+#ifdef CONFIG_ARCH_BOARD_AMBE2K
+  extern int ambe2k_initialize(void);
+#endif
   int ret;
 
   /* Mount the procfs at /proc */

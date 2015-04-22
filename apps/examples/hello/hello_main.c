@@ -38,7 +38,9 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
+#ifdef CONFIG_FS_YAFFS2
 #include <nuttx/fs/yaffsfs.h>
+#endif
 #include <stdio.h>
 #include <fcntl.h>
 
@@ -64,53 +66,71 @@ int main(int argc, FAR char *argv[])
 int hello_main(int argc, char *argv[])
 #endif
 {
-  char mountpt[] = "/nand";
-  int h;
-  int wrote;
-  static char buffer[1000];
-  char fn[100];
+#ifdef CONFIG_FS_YAFFS2
+  {
+    char mountpt[] = "/nand";
+    int h;
+    int wrote;
+    static char buffer[1000];
+    char fn[100];
 
 #if 0
-  sprintf(fn, "%s/text", mountpt);
-  yaffs_mount(mountpt);
+    sprintf(fn, "%s/text", mountpt);
+    yaffs_mount(mountpt);
 #endif
 
 #if 0
-  h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
-  printf("h=%d\n", h);
-  wrote = yaffs_write(h, buffer, sizeof(buffer));
-  printf("wrote=%d\n", wrote);
-  //yaffs_unlink(fn);
-  yaffs_close(h);
+    h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
+    printf("h=%d\n", h);
+    wrote = yaffs_write(h, buffer, sizeof(buffer));
+    printf("wrote=%d\n", wrote);
+    //yaffs_unlink(fn);
+    yaffs_close(h);
 #endif
 #if 1
-  {
-	  int i;
-	  int fsize;
-	  for(i = 1; i < 2000; i++) {
-		  sprintf(fn,"%s/f%d",mountpt, i);
-		  fsize = (i%10) * 10000 + 20000;
-		  h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
-		  while (fsize > 0) {
-			  wrote = yaffs_write(h, buffer, sizeof(buffer));
-			  if (wrote != sizeof(buffer)) {
-				  printf("Writing file %s, only wrote %d bytes\n", fn, wrote);
-				  break;
-			  }
-			  fsize -= wrote;
-		  }
-		  yaffs_unlink(fn);
-		  yaffs_close(h);
-	  }
+    {
+      int i;
+      int fsize;
+      for(i = 1; i < 2000; i++) {
+        sprintf(fn,"%s/f%d",mountpt, i);
+        fsize = (i%10) * 10000 + 20000;
+        h = yaffs_open(fn, O_CREAT | O_TRUNC | O_RDWR, 0666);
+        while (fsize > 0) {
+          wrote = yaffs_write(h, buffer, sizeof(buffer));
+          if (wrote != sizeof(buffer)) {
+            printf("Writing file %s, only wrote %d bytes\n", fn, wrote);
+            break;
+          }
+          fsize -= wrote;
+        }
+        yaffs_unlink(fn);
+        yaffs_close(h);
+      }
 #endif
+    }
 
+#if 1
+    yaffs_unmount(mountpt);
+#endif
   }
+#endif /* CONFIG_FS_YAFFS2 */
+
+#ifdef CONFIG_ARCH_BOARD_AMBE2K
+  {
+    extern void hexdump(const void *buf_, size_t size, uint16_t ofs);
+    uint8_t frm[24];
+
+    extern void ambe2k_send_frame(uint8_t *frm);
+    extern void ambe2k_recv_frame(uint8_t *frm);
+    while (1) {
+      ambe2k_recv_frame(frm);
+      hexdump(frm, 24, 0);
+      ambe2k_send_frame(frm);
+    }
+  }
+#endif
 
   printf("Hello, World!!\n");
-
-#if 1
-  yaffs_unmount(mountpt);
-#endif
 
   return 0;
 }
