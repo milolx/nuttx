@@ -348,6 +348,7 @@ int nsh_archinitialize(void)
     }
 
   can_devinit();
+  ambe2k_initialize();
 
   return ret;
 }

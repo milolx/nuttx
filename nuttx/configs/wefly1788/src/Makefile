@@ -27,6 +27,10 @@ ifeq ($(CONFIG_CAN),y)
   CSRCS += lpc17_can.c
 endif
 
+ifeq ($(CONFIG_ARCH_BOARD_AMBE2K),y)
+  CSRCS += lpc17_ambe2k.c
+endif
+
 AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
 

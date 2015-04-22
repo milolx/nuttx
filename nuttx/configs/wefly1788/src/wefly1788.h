@@ -8,6 +8,7 @@
 #include <nuttx/config.h>
 #include <nuttx/compiler.h>
 #include <lpc17_gpio.h>
+#include <arch/irq.h>
 
 /************************************************************************************
  * Definitions
@@ -82,6 +83,17 @@
 /* Backlight enable, P2[1].  Initial state is OFF (zero) */
 
 #define GPIO_LCD_BL      (GPIO_OUTPUT | GPIO_VALUE_ONE | GPIO_PORT3 | GPIO_PIN24)
+
+/* ABME2000 */
+#define GPIO_AMBE2K_CLK    GPIO_SSP0_SCK_3
+#define GPIO_AMBE2K_STRB   GPIO_SSP0_SSEL_4
+#define GPIO_AMBE2K_RXDATA GPIO_SSP0_MISO_2
+#define GPIO_AMBE2K_TXDATA GPIO_SSP0_MOSI_4
+#define GPIO_AMBE2K_EPR    GPIO_EINT1_2      // use ext-interrupt1
+//#define GPIO_AMBE2K_EPR    (GPIO_INTFE | GPIO_PULLUP | GPIO_PORT2 | GPIO_PIN11)
+#define GPIO_AMBE2K_RST    (GPIO_OUTPUT | GPIO_VALUE_ONE | GPIO_PORT3 | GPIO_PIN27)
+#define INTR_AMBE2K_EPR    LPC17_IRQ_EINT1
+//#define INTR_AMBE2K_EPR    LPC17_IRQ_P2p11
 
 /* XPT2046 Touchscreen **************************************************************/
 /* -------------- -------------------- ------------ --------------------------------
