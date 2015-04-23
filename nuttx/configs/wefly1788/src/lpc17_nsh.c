@@ -334,7 +334,7 @@ int nsh_archinitialize(void)
   int ret;
 
   /* Mount the procfs at /proc */
-  ret = mount(NULL, "/proc", "procfs", 0, NULL);
+  ret = mount(NULL, CONFIG_NSH_PROC_MOUNTPOUNT, "procfs", 0, NULL);
   if (ret < 0)
       printf("ERROR: Failed to mount the procfs : %d\n", errno);
 
