@@ -149,6 +149,8 @@ static sem_t g_notify_sem;
 
 static void nsh_netinit_configure(void)
 {
+  int ret;
+  uint8_t iff;
   struct in_addr addr;
 #if defined(CONFIG_NSH_DHCPC)
   FAR void *handle;
@@ -158,6 +160,7 @@ static void nsh_netinit_configure(void)
   uint8_t mac[IFHWADDRLEN];
 #endif
 
+again:
   nvdbg("Entry\n");
 
   /* Many embedded network interfaces must have a software assigned MAC */
@@ -250,6 +253,19 @@ static void nsh_netinit_configure(void)
         dhcpc_close(handle);
     }
 #endif
+
+  ret = netlib_getifstatus(NET_DEVNAME, &iff);
+  if (ret != OK)
+    {
+      ndbg("Get %s interface flags error: %d\n", NET_DEVNAME, ret);
+      iff = 0;
+    }
+
+  if (!(iff & IFF_UP))
+    {
+      sleep(1);
+      goto again;
+    }
 
   nvdbg("Exit\n");
 }
