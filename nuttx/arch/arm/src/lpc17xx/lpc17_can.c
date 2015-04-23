@@ -838,6 +838,8 @@ static int can_send(FAR struct can_dev_s *dev, FAR struct can_msg_s *msg)
       can_putreg(priv, LPC17_CAN_CMR_OFFSET, CAN_CMR_STB2 | CAN_CMR_TR);
 #endif
     }
+#endif
+#if 0
   else if ((regval & CAN_SR_TBS3) != 0)
     {
       /* Make sure that buffer 3 TX interrupts are enabled BEFORE sending the

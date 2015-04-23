@@ -52,6 +52,8 @@ static void *thread_func_s(void *parameter)
 		}
 		//tot += 8;
 	}
+
+	return NULL;
 }
 
 static void *thread_func_r(void *parameter)
@@ -88,6 +90,8 @@ static void *thread_func_r(void *parameter)
 		}
 		tot += 8;
 	}
+
+	return NULL;
 }
 
 int can_main(int argc, char *argv[])

@@ -328,15 +328,15 @@ int nsh_archinitialize(void)
 #ifdef CONFIG_ARCH_BOARD_AMBE2K
   extern int ambe2k_initialize(void);
 #endif
+#if defined(CONFIG_LPC17_CAN1) || defined(CONFIG_LPC17_CAN2)
+  extern int can_devinit(void);
+#endif
   int ret;
 
   /* Mount the procfs at /proc */
   ret = mount(NULL, "/proc", "procfs", 0, NULL);
   if (ret < 0)
-    {
-      fdbg("ERROR: Failed to mount the procfs : %d\n", errno);
-      return ret;
-    }
+      printf("ERROR: Failed to mount the procfs : %d\n", errno);
 
 #ifdef CONFIG_LPC17_EXTNAND
   lpc17_nand_automount();
@@ -352,7 +352,7 @@ int nsh_archinitialize(void)
       ret = nsh_usbhostinitialize();
     }
 
-#if defined(LPC17_CAN1) || defined(LPC17_CAN2)
+#if defined(CONFIG_LPC17_CAN1) || defined(CONFIG_LPC17_CAN2)
   can_devinit();
 #endif
 
