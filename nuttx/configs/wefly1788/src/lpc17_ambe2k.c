@@ -27,8 +27,6 @@
 #include "lpc17_gpio.h"
 #include "wefly1788.h"
 
-#define GPIO_xx    (GPIO_OUTPUT | GPIO_VALUE_ONE | GPIO_PORT3 | GPIO_PIN24)
-
 /* SSP Clocking *************************************************************/
 
 /* All peripherals are clocked by the same peripheral clock in the LPC178x
@@ -49,12 +47,13 @@ struct lpc17_sspdev_s
 	uint8_t          irq;     /* SPI IRQ number */
 };
 
-#define AMBE2K_FRAME_SIZE	24
+#define AMBE2K_DATA_NUM		24
+#define AMBE2K_FRAME_SIZE	(sizeof(uint16_t) * AMBE2K_DATA_NUM)
 #define AMBE2K_HDR		0x13ec
 
 // pingpong mode
 typedef struct {
-	uint16_t data[AMBE2K_FRAME_SIZE];
+	uint16_t data[AMBE2K_DATA_NUM];
 	uint8_t valid;		// if a valid frame exist
 	uint8_t blocking;	// is user waiting for valid data
 }ambe2k_buf_t;
@@ -64,9 +63,9 @@ typedef struct {
 	ambe2k_buf_t buf_r;
 	ambe2k_buf_t buf_s;
 
-	uint16_t data_r[AMBE2K_FRAME_SIZE];
+	uint16_t data_r[AMBE2K_DATA_NUM];
 	int pos_r;		// pos in working frame
-	uint16_t data_s[AMBE2K_FRAME_SIZE];
+	uint16_t data_s[AMBE2K_DATA_NUM];
 	int pos_s;		// pos in working frame
 
 	sem_t sem_frm_r;
@@ -261,7 +260,6 @@ static void ssp_recv_rx_fifo(ambe2k_dev_t *dev)
 			if (val == AMBE2K_HDR) {
 				static int x=1;
 				x=!x;
-	lpc17_gpiowrite(GPIO_xx, x);
 				dev->pos_r = 0;
 				// we can send actual data *now*
 				dev->send_data = 1;
@@ -272,7 +270,7 @@ static void ssp_recv_rx_fifo(ambe2k_dev_t *dev)
 
 		dev->data_r[dev->pos_r ++] = val;
 
-		if (dev->pos_r == AMBE2K_FRAME_SIZE) {
+		if (dev->pos_r == AMBE2K_DATA_NUM) {
 			// save the frame for user
 			sem_wait(&dev->sem_frm_r);
 			memcpy(dev->buf_r.data, dev->data_r, AMBE2K_FRAME_SIZE);
@@ -331,7 +329,7 @@ static void ssp_fill_tx_fifo(ambe2k_dev_t *dev)
 		val = 0;
 
 		if (dev->send_data) {
-			if (dev->pos_s < AMBE2K_FRAME_SIZE) {
+			if (dev->pos_s < AMBE2K_DATA_NUM) {
 				val = dev->buf_s.data[dev->pos_s];
 				++ dev->pos_s;
 			}
@@ -568,7 +566,7 @@ void ambe2k_send_frame(uint8_t *frm)
 {
 	sem_wait(&g_dev.sem_frm_s);
 
-	memcpy(g_dev.buf_s.data, frm, sizeof(uint16_t)*AMBE2K_FRAME_SIZE);
+	memcpy(g_dev.buf_s.data, frm, AMBE2K_FRAME_SIZE);
 	g_dev.buf_r.valid = 1;
 
 	sem_post(&g_dev.sem_frm_s);
@@ -581,7 +579,7 @@ void ambe2k_recv_frame(uint8_t *frm)
 	do {
 		sem_wait(&g_dev.sem_frm_r);
 		if (g_dev.buf_r.valid) {
-			memcpy(frm, g_dev.buf_r.data, sizeof(uint16_t)*AMBE2K_FRAME_SIZE);
+			memcpy(frm, g_dev.buf_r.data, AMBE2K_FRAME_SIZE);
 			g_dev.buf_r.valid = 0;
 			should_wait = 0;
 		}
@@ -612,9 +610,6 @@ int ambe2k_initialize(void)
 
 	lpc17_configgpio(GPIO_AMBE2K_RST);
 	lpc17_gpiowrite(GPIO_AMBE2K_RST, 1);
-
-	lpc17_configgpio(GPIO_xx);
-	lpc17_gpiowrite(GPIO_xx, 1);
 
 	lpc17_timer_init(&g_dev);
 	lpc17_ssp_init(&g_dev);

@@ -118,13 +118,13 @@ int hello_main(int argc, char *argv[])
 #ifdef CONFIG_ARCH_BOARD_AMBE2K
   {
     extern void hexdump(const void *buf_, size_t size, uint16_t ofs);
-    uint8_t frm[24];
+    uint8_t frm[24*2];
 
     extern void ambe2k_send_frame(uint8_t *frm);
     extern void ambe2k_recv_frame(uint8_t *frm);
     while (1) {
       ambe2k_recv_frame(frm);
-      hexdump(frm, 24, 0);
+      hexdump(frm, 2*24, 0);
       ambe2k_send_frame(frm);
     }
   }
