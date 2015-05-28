@@ -129,6 +129,24 @@ int hello_main(int argc, char *argv[])
     }
   }
 #endif
+#if 1
+  {
+    char chw=0;
+    char chr;
+    int fd;
+
+    fd = open("/dev/ttyS1", O_RDWR);
+    while (1) {
+      write(fd, &chw, 1);
+      read(fd, &chr, 1);
+      if (chw != chr)
+        printf("exp: %02x, get: %02x\n", chw, chr);
+      else
+        printf("ok\n");
+      ++chw;
+    }
+  }
+#endif
 
   printf("Hello, World!!\n");
 
