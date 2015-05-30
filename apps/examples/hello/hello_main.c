@@ -119,9 +119,23 @@ int hello_main(int argc, char *argv[])
   {
     extern void hexdump(const void *buf_, size_t size, uint16_t ofs);
     uint8_t frm[24*2];
+    uint16_t *frm16=(uint16_t *)frm;
 
     extern void ambe2k_send_frame(uint8_t *frm);
     extern void ambe2k_recv_frame(uint8_t *frm);
+
+    while (1) {
+      ambe2k_recv_frame(frm);
+      if (frm16[2] == 0xbfc0)
+	      break;
+      frm16[2] = 0xbfc0;	// Rate Info0
+      frm16[3] = 0;	// Rate Info1
+      frm16[4] = 0;	// Rate Info2
+      frm16[5] = 0;	// Rate Info3
+      frm16[6] = 0x72c0;	// Rate Info4
+      frm16[11] = 0x2000;	// Rate Info4
+      ambe2k_send_frame(frm);
+    }
     while (1) {
       ambe2k_recv_frame(frm);
       hexdump(frm, 2*24, 0);
