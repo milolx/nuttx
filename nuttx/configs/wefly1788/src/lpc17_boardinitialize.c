@@ -45,6 +45,9 @@ void lpc17_boardinitialize(void)
 {
   /* Initialize the EMC, SDRAM, NOR FLASH, and NAND FLASH */
 
+  lpc17_configgpio(GPIO_SPK_ENABLE);
+  lpc17_gpiowrite(GPIO_SPK_ENABLE, 1);
+
 #ifdef CONFIG_LPC17_EMC
   lpc17_emcinitialize();
 #ifdef CONFIG_LPC17_EXTDRAM
