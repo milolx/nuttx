@@ -567,7 +567,7 @@ void ambe2k_send_frame(uint8_t *frm)
 	sem_wait(&g_dev.sem_frm_s);
 
 	memcpy(g_dev.buf_s.data, frm, AMBE2K_FRAME_SIZE);
-	g_dev.buf_r.valid = 1;
+	g_dev.buf_s.valid = 1;
 
 	sem_post(&g_dev.sem_frm_s);
 }
