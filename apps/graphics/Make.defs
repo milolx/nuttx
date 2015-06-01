@@ -34,6 +34,10 @@
 #
 ############################################################################
 
+ifeq ($(CONFIG_WEFLY_UI),y)
+CONFIGURED_APPS += graphics/wefly_ui
+endif
+
 ifeq ($(CONFIG_TIFF),y)
 CONFIGURED_APPS += graphics/tiff
 endif

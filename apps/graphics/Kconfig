@@ -3,6 +3,12 @@
 # see misc/tools/kconfig-language.txt.
 #
 
+config WEFLY_UI
+	bool "Wefly graphics UI"
+	default n
+	---help---
+		Enable the Wefly graphics user interface
+
 config TIFF
 	bool "TIFF file generation library"
 	default n
